@@ -1,24 +1,24 @@
-#ifndef PACMAN_H
-#define PACMAN_H
-#include "Seres.h"
+#ifndef FANTASMITA_H
+#define FANTASMITA_H
+#include "Pacman.h"
 
-const char * __filePacman__Derecha = "pac.bmp";
-const char * __filePacman__Arriba = "pac";
-const char * __filePacman__Izquierda = "pac";
-const char * __filePacman__Abajo = "pac";
-const int velocidad  = 1;
+const char * __fileFantasmita__Izquierda = "fan";
+const char * __fileFantasmita__Arriba = "fan";
+const char * __fileFantasmita__Derecha = "fan";
+const char * __fileFantasmita__Abajo = "fan";
 
-class Pacman:public Seres
+class Fantasmita:public Seres
 {
     public:
-        Pacman();
-        Pacman(BITMAP * buffer, Coordenada x, Coordenada y);
-        virtual ~Pacman();
+        Fantasmita();
+        Fantasmita(BITMAP * buffer, Coordenada x, Coordenada y);
+        virtual ~Fantasmita();
     protected:
     private:
+        Pacman * pac;
 };
 
-Pacman::~Pacman(){
+Fantasmita::~Fantasmita(){
     destroy_bitmap(serIzquierda);
     destroy_bitmap(serDerecha);
     destroy_bitmap(serArriba);
@@ -26,7 +26,7 @@ Pacman::~Pacman(){
     destroy_bitmap(imagen);
 }
 
-Pacman::Pacman(BITMAP * buffer, Coordenada x, Coordenada y){
+Fantasmita::Fantasmita(BITMAP * buffer, Coordenada x, Coordenada y){
     this->buffer = buffer;
     serIzquierda = load_bitmap(__filePacman__Izquierda,NULL);
     serDerecha = load_bitmap(__filePacman__Derecha,NULL);
@@ -39,7 +39,7 @@ Pacman::Pacman(BITMAP * buffer, Coordenada x, Coordenada y){
     mostrar = true;
 }
 
-Pacman::Pacman(){
+Fantasmita::Fantasmita(){
     imagen = nullptr;
     serAbajo = nullptr;
     serArriba = nullptr;
@@ -51,5 +51,4 @@ Pacman::Pacman(){
     y = 0;
 }
 
-
-#endif // PACMAN_H
+#endif // FANTASMITA_H

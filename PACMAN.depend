@@ -1,0 +1,47 @@
+# depslib dependency file v1.0
+1448510905 source:/home/chris/Documentos/PACMAN/main.cpp
+	<iostream>
+	"Game.h"
+
+1448560819 /home/chris/Documentos/PACMAN/include/Game.h
+	"Tablero.h"
+	"Fantasmita.h"
+
+1448560749 /home/chris/Documentos/PACMAN/include/Tablero.h
+	"IntervalTree.h"
+	"Dibujo.h"
+	<iostream>
+
+1448560474 /home/chris/Documentos/PACMAN/include/IntervalTree.h
+	"fstream"
+	"iostream"
+	"list"
+
+1448505366 /home/chris/Documentos/PACMAN/include/Dibujo.h
+	"iostream"
+	<allegro.h>
+	"sad.h"
+
+1448559577 /home/chris/Documentos/PACMAN/include/sad.h
+
+1448508399 /home/chris/Documentos/PACMAN/include/Fantasmita.h
+	"Pacman.h"
+
+1448508240 /home/chris/Documentos/PACMAN/include/Pacman.h
+	"Seres.h"
+
+1448559579 /home/chris/Documentos/PACMAN/include/Seres.h
+	"Dibujo.h"
+
+1448496646 source:/home/chris/Documentos/PACMAN/src/Dibujo.cpp
+
+1448507161 source:/home/chris/Documentos/PACMAN/src/Fantasmita.cpp
+
+1448507062 source:/home/chris/Documentos/PACMAN/src/Game.cpp
+
+1448501435 source:/home/chris/Documentos/PACMAN/src/Pacman.cpp
+
+1448501591 source:/home/chris/Documentos/PACMAN/src/Seres.cpp
+
+1448485263 source:/home/chris/Documentos/PACMAN/src/Tablero.cpp
+

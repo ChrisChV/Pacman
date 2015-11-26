@@ -4,8 +4,6 @@
 #include "iostream"
 #include "list"
 
-using namespace std;
-
 enum Colores{NEGRO, ROJO};
 enum Giros{IZQUIERDA, DERECHA};
 
@@ -16,9 +14,10 @@ class IntervalTree
         class Nodo{
             public:
                 Nodo();
-                Nodo(T,T,V);
+                Nodo(T,T,T,V);
                 T low;
                 T high;
+                T in;
                 T max;
                 V valor;
                 Nodo * hijos[2];
@@ -27,64 +26,88 @@ class IntervalTree
                 void destruirme();
         };
         IntervalTree();
-        void insert(T,T,V);
-        bool find(T,T, V);
+        void insert(T,T,T,V);
+        std::list<Nodo *> find(T,T);
         void print();
+        void _print();
+        int size(){return siz;};
+        void verificarMax(Nodo *);
+        Nodo * root;
         virtual ~IntervalTree();
     protected:
     private:
-        Nodo * root;
-        int _find(T, Nodo **&, Nodo *&);
+
+        int _find(T,T,T, Nodo **&, Nodo *&);
         bool __find(T, Nodo **&, Nodo *&);
         void rotacionSimple(Nodo *&, bool);
         void rotacionCompleja(Nodo *&, bool);
-        void verificarMax(Nodo *);
-        bool find(T,T,Nodo*, V res);
+        int siz;
+        void find(T,T,Nodo*, std::list<Nodo *> &res);
 
 };
 
 template <typename T, typename V>
-bool IntervalTree<T>::find(T low, T high, V res){
-    return find(low,high,root,res);
+void IntervalTree<T,V>::_print(){
+    std::list<Nodo *> nodos;
+    if(root) nodos.push_back(root);
+    for(auto iter = nodos.begin(); iter != nodos.end(); iter++){
+        std::cout<<"NODO->"<<(*iter)->low<<"--"<<(*iter)->high<<"--"<<(*iter)->max<<std::endl;
+        if((*iter)->hijos[0]){
+            nodos.push_back((*iter)->hijos[0]);
+            std::cout<<"Izquierdo->"<<(*iter)->hijos[0]->low<<"--"<<(*iter)->hijos[0]->high<<std::endl;
+        }
+        if((*iter)->hijos[1]){
+            nodos.push_back((*iter)->hijos[1]);
+            std::cout<<"Derecho->"<<(*iter)->hijos[1]->low<<"--"<<(*iter)->hijos[1]->high<<std::endl;
+        }
+    }
 }
 
 template <typename T, typename V>
-bool IntervalTree<T,V>::find(T low, T high, Nodo *nodo, V res){
-    if(!nodo) return false;
+std::list<typename IntervalTree<T,V>::Nodo*> IntervalTree<T,V>::find(T low, T high){
+    std::list<Nodo*> res;
+    find(low,high,root,res);
+    return res;
+}
+
+template <typename T, typename V>
+void IntervalTree<T,V>::find(T low, T high, Nodo *nodo, std::list<Nodo*>& res){
+    if(!nodo) return;
     if(low >= nodo->low and high <= nodo->high){
-        res = nodo->valor;
-        return true;
+        res.push_back(nodo);
+        find(low,high,nodo->hijos[0],res);
+        find(low,high,nodo->hijos[1],res);
     }
-    else if(nodo->hijos[0] and nodo->hijos[0]->max > nodo->low){
-        return find(low,high,nodo->hijos[0],res);
+    else if(nodo->hijos[0] and nodo->hijos[0]->max > low){
+        find(low,high,nodo->hijos[0],res);
     }
-    else return find(low,high,nodo->hijos[1],res);
+    else find(low,high,nodo->hijos[1],res);
 }
 
 template <typename T, typename V>
 void IntervalTree<T,V>::print(){
-    ofstream archivo("eje.dot");
+    std::ofstream archivo("eje.dot");
     if(archivo.fail()){
-        cout<<"EL archivo no se pudo abrir"<<endl;
+        std::cout<<"EL archivo no se pudo abrir"<<std::endl;
         return;
     }
-    archivo<<"digraph{"<<endl;
-    list<Nodo *> result;
+    archivo<<"digraph{"<<std::endl;
+    std::list<Nodo *> result;
     if(root) result.push_back(root);
     while(!result.empty()){
-        list<Nodo *> temp;
+        std::list<Nodo *> temp;
         for(auto iter = result.begin(); iter != result.end(); ++iter){
-            string color;
+            std::string color;
             if((*iter)->color) color = "red";
             else color = "black";
-            archivo<<(*iter)->low * (*iter)->high + 1<<" [label=\"["<<(*iter)->low<<","<<(*iter)->high<<"]"<<endl<<"max = "<<(*iter)->max<<"\", color = "<<color<<"];"<<endl;
+            archivo<<(*iter)->low * (*iter)->high + 1<<" [label=\"["<<(*iter)->low<<","<<(*iter)->high<<"]"<<std::endl<<"max = "<<(*iter)->max<<"\", color = "<<color<<"];"<<std::endl;
             if((*iter)->hijos[0]){
                 temp.push_back((*iter)->hijos[0]);
-                archivo<<(*iter)->low * (*iter)->high + 1<<"->"<<(*iter)->hijos[0]->low * (*iter)->hijos[0]->high +1<<";"<<endl;
+                archivo<<(*iter)->low * (*iter)->high + 1<<"->"<<(*iter)->hijos[0]->low * (*iter)->hijos[0]->high +1<<";"<<std::endl;
             }
             if((*iter)->hijos[1]){
                 temp.push_back((*iter)->hijos[1]);
-                archivo<<(*iter)->low * (*iter)->high + 1<<"->"<<(*iter)->hijos[1]->low * (*iter)->hijos[1]->high +1<<";"<<endl;
+                archivo<<(*iter)->low * (*iter)->high + 1<<"->"<<(*iter)->hijos[1]->low * (*iter)->hijos[1]->high +1<<";"<<std::endl;
             }
         }
         result = temp;
@@ -95,10 +118,10 @@ void IntervalTree<T,V>::print(){
 }
 
 template <typename T, typename V>
-void IntervalTree<T,V>::insert(T low, T high, V val){
+void IntervalTree<T,V>::insert(T low, T high,T in, V val){
     Nodo ** nodo;
     Nodo * padre;
-    int flag = this->_find(low, nodo, padre);
+    int flag = this->_find(low,high,in, nodo, padre);
     if(flag == 1){
         return;
         /*
@@ -110,16 +133,16 @@ void IntervalTree<T,V>::insert(T low, T high, V val){
         __find(low,nodo,padre);
         */
     }
-    *nodo = new Nodo(low, high,val);
+    *nodo = new Nodo(low, high,in,val);
     (*nodo)->padre = padre;
     if(flag == -1) root->color = NEGRO;
-    verificarMax(*nodo);
     Nodo *iter = *nodo;
+    siz++;
     while(iter->padre){
         if(iter->padre->color == NEGRO)break;
         if(iter == root)break;
         if(iter->padre->color == ROJO){
-            if(!iter->padre->padre->hijos[iter->padre->low < iter->padre->padre->low] or iter->padre->padre->hijos[iter->padre->low < iter->padre->padre->low]->color == NEGRO){
+            if(!iter->padre->padre->hijos[iter->padre->low <= iter->padre->padre->low] or iter->padre->padre->hijos[iter->padre->low < iter->padre->padre->low]->color == NEGRO){
                 if(iter->low > iter->padre->low){
                     if(iter->padre->low > iter->padre->padre->low) rotacionSimple(iter->padre->padre, DERECHA);
                     else rotacionCompleja(iter->padre->padre, IZQUIERDA);
@@ -135,10 +158,12 @@ void IntervalTree<T,V>::insert(T low, T high, V val){
                 iter->padre->padre->hijos[0]->color = NEGRO;
                 iter->padre->padre->hijos[1]->color = NEGRO;
                 iter = iter->padre->padre;
+
             }
         }
     }
     if(root->color == ROJO) root->color = NEGRO;
+    verificarMax(iter);
 }
 
 template <typename T, typename V>
@@ -233,12 +258,12 @@ void IntervalTree<T,V>::rotacionSimple(Nodo *&padre, bool flag){
 }
 
 template <typename T, typename V>
-int IntervalTree<T,V>::_find(T valor, Nodo **& nodo, Nodo *& padre){
+int IntervalTree<T,V>::_find(T valor,T valor2,T in, Nodo **& nodo, Nodo *& padre){
     nodo = &(root);
     padre = nullptr;
     if(!root)return -1;
     while(*nodo){
-        if((*nodo)->low == valor)return 1;
+        if((*nodo)->low == valor and (*nodo)->high == valor2 and (*nodo)->in == in)return 1;
         if(!padre) padre = root;
         else padre = *nodo;
         nodo = &((*nodo)->hijos[(*nodo)->low < valor]);
@@ -260,9 +285,10 @@ bool IntervalTree<T,V>::__find(T valor, Nodo **& nodo, Nodo *& padre){
 }
 
 template <typename T, typename V>
-IntervalTree<T,V>::Nodo::Nodo(T low, T high, V val){
+IntervalTree<T,V>::Nodo::Nodo(T low, T high,T in, V val){
     hijos[0] = nullptr;
     hijos[1] = nullptr;
+    this->in = in;
     padre = nullptr;
     color = ROJO;
     this->valor = val;
@@ -288,6 +314,7 @@ void IntervalTree<T,V>::Nodo::destruirme(){
 template <typename T, typename V>
 IntervalTree<T,V>::IntervalTree(){
     root = nullptr;
+    siz = 0;
 }
 
 template <typename T, typename V>

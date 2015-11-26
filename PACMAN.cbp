@@ -34,9 +34,20 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Unit filename="include/Dibujo.h" />
+		<Unit filename="include/Fantasmita.h" />
+		<Unit filename="include/Game.h" />
 		<Unit filename="include/IntervalTree.h" />
+		<Unit filename="include/Pacman.h" />
+		<Unit filename="include/Seres.h" />
 		<Unit filename="include/Tablero.h" />
+		<Unit filename="include/sad.h" />
 		<Unit filename="main.cpp" />
+		<Unit filename="src/Dibujo.cpp" />
+		<Unit filename="src/Fantasmita.cpp" />
+		<Unit filename="src/Game.cpp" />
+		<Unit filename="src/Pacman.cpp" />
+		<Unit filename="src/Seres.cpp" />
 		<Unit filename="src/Tablero.cpp" />
 		<Extensions>
 			<code_completion />

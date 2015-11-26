@@ -2,12 +2,13 @@
 #define DIBUJO_H
 #include "iostream"
 #include <allegro.h>
+#include "sad.h"
 
 class Dibujo
 {
     public:
         Dibujo();
-        Dibujo(const char *file, BITMAP * buffer, int x, int y);
+        Dibujo(const char *file, BITMAP * buffer, Coordenada x, Coordenada y);
         virtual void dibujar();
         void activar(){mostrar = true;};
         void desactivar(){mostrar = false;};
@@ -17,8 +18,8 @@ class Dibujo
         BITMAP * imagen;
         BITMAP * buffer;
         bool mostrar;
-        int x;
-        int y;
+        Coordenada x;
+        Coordenada y;
     private:
 
 };
@@ -31,7 +32,7 @@ void Dibujo::dibujar(){
     if(mostrar and imagen and buffer) draw_sprite(buffer,imagen,x,y);
 }
 
-Dibujo::Dibujo(const char* file, BITMAP* buffer,int x, int y){
+Dibujo::Dibujo(const char* file, BITMAP* buffer,Coordenada x, Coordenada y){
     setImagen(file);
     this->buffer = buffer;
     this->x = x;
@@ -47,8 +48,8 @@ Dibujo::~Dibujo(){
 Dibujo::Dibujo(){
     imagen = nullptr;
     mostrar = false;
-    int x = 0;
-    int y = 0;
+    x = 0;
+    y = 0;
 }
 
 #endif // DIBUJO_H
