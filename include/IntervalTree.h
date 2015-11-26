@@ -28,7 +28,7 @@ class IntervalTree
         };
         IntervalTree();
         void insert(T,T,V);
-        list<Nodo *> find(T,T);
+        bool find(T,T, V);
         void print();
         virtual ~IntervalTree();
     protected:
@@ -39,29 +39,26 @@ class IntervalTree
         void rotacionSimple(Nodo *&, bool);
         void rotacionCompleja(Nodo *&, bool);
         void verificarMax(Nodo *);
-        void find(T,T,Nodo*, list<Nodo *>&);
+        bool find(T,T,Nodo*, V res);
 
 };
 
 template <typename T, typename V>
-list< typename IntervalTree<T,V>::Nodo *> IntervalTree<T>::find(T low, T high){
-    list<Nodo *> result;
-    find(low,high,root,result);
-    return result;
+bool IntervalTree<T>::find(T low, T high, V res){
+    return find(low,high,root,res);
 }
 
 template <typename T, typename V>
-void IntervalTree<T,V>::find(T low, T high, Nodo *nodo, list<Nodo *> &result){
-    if(!nodo)return;
+bool IntervalTree<T,V>::find(T low, T high, Nodo *nodo, V res){
+    if(!nodo) return false;
     if(low >= nodo->low and high <= nodo->high){
-        result.push_back(nodo);
-        find(low,high,nodo->hijos[0],result);
-        find(low,high,nodo->hijos[1],result);
+        res = nodo->valor;
+        return true;
     }
     else if(nodo->hijos[0] and nodo->hijos[0]->max > nodo->low){
-        find(low,high,nodo->hijos[0],result);
+        return find(low,high,nodo->hijos[0],res);
     }
-    else find(low,high,nodo->hijos[1],result);
+    else return find(low,high,nodo->hijos[1],res);
 }
 
 template <typename T, typename V>
