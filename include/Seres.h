@@ -11,6 +11,8 @@ class Seres:public Dibujo
         void avanzar();
         void cambiarDir(Dir_Ser dir);
         bool colision(Seres *);
+        Dir_Ser direccion;
+        Dir_Ser proximaDir;
         virtual ~Seres();
     protected:
         BITMAP * serIzquierda;
@@ -18,7 +20,6 @@ class Seres:public Dibujo
         BITMAP * serArriba;
         BITMAP * serAbajo;
         Velocidad velocidad;
-        Dir_Ser direccion;
     private:
 };
 

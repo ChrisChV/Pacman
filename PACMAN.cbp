@@ -35,10 +35,8 @@
 			<Add option="-fexceptions" />
 		</Compiler>
 		<Unit filename="include/Dibujo.h" />
-		<Unit filename="include/Fantasmita.h" />
 		<Unit filename="include/Game.h" />
 		<Unit filename="include/IntervalTree.h" />
-		<Unit filename="include/Pacman.h" />
 		<Unit filename="include/Seres.h" />
 		<Unit filename="include/Tablero.h" />
 		<Unit filename="include/sad.h" />

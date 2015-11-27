@@ -3,34 +3,33 @@
 	<iostream>
 	"Game.h"
 
-1448560819 /home/chris/Documentos/PACMAN/include/Game.h
+1448653790 /home/chris/Documentos/PACMAN/include/Game.h
 	"Tablero.h"
 	"Fantasmita.h"
 
-1448560749 /home/chris/Documentos/PACMAN/include/Tablero.h
+1448654250 /home/chris/Documentos/PACMAN/include/Tablero.h
 	"IntervalTree.h"
-	"Dibujo.h"
+	"Seres.h"
 	<iostream>
 
-1448560474 /home/chris/Documentos/PACMAN/include/IntervalTree.h
+1448652193 /home/chris/Documentos/PACMAN/include/IntervalTree.h
 	"fstream"
 	"iostream"
 	"list"
 
-1448505366 /home/chris/Documentos/PACMAN/include/Dibujo.h
+1448653478 /home/chris/Documentos/PACMAN/include/Dibujo.h
 	"iostream"
 	<allegro.h>
 	"sad.h"
+	"tuple"
 
-1448559577 /home/chris/Documentos/PACMAN/include/sad.h
+1448649371 /home/chris/Documentos/PACMAN/include/sad.h
 
-1448508399 /home/chris/Documentos/PACMAN/include/Fantasmita.h
-	"Pacman.h"
+1448647080 /home/chris/Documentos/PACMAN/include/Fantasmita.h
 
-1448508240 /home/chris/Documentos/PACMAN/include/Pacman.h
-	"Seres.h"
+1448646892 /home/chris/Documentos/PACMAN/include/Pacman.h
 
-1448559579 /home/chris/Documentos/PACMAN/include/Seres.h
+1448649301 /home/chris/Documentos/PACMAN/include/Seres.h
 	"Dibujo.h"
 
 1448496646 source:/home/chris/Documentos/PACMAN/src/Dibujo.cpp

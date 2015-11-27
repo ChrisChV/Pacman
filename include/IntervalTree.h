@@ -66,7 +66,10 @@ void IntervalTree<T,V>::_print(){
 template <typename T, typename V>
 std::list<typename IntervalTree<T,V>::Nodo*> IntervalTree<T,V>::find(T low, T high){
     std::list<Nodo*> res;
+    std::cout<<"LOW->"<<low<<std::endl;
+    std::cout<<"HIGTH->"<<high<<std::endl;
     find(low,high,root,res);
+    std::cout<<"AAAAAAAAAAA->"<<res.size()<<std::endl;
     return res;
 }
 

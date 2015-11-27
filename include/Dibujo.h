@@ -3,6 +3,7 @@
 #include "iostream"
 #include <allegro.h>
 #include "sad.h"
+#include "tuple"
 
 class Dibujo
 {
@@ -13,6 +14,11 @@ class Dibujo
         void activar(){mostrar = true;};
         void desactivar(){mostrar = false;};
         void setImagen(const char * file);
+        void updateX(Coordenada x){this->x = x;};
+        void updateY(Coordenada y){this->y = y;};
+        std::tuple<int,int> puntoMedio();
+        std::tuple<Coordenada,Coordenada> getCoordenadas();
+        std::tuple<int,int> getTamImagen();
         virtual ~Dibujo();
     protected:
         BITMAP * imagen;
@@ -23,6 +29,18 @@ class Dibujo
     private:
 
 };
+
+std::tuple<int,int> Dibujo::getTamImagen(){
+    return std::make_tuple(imagen->w,imagen->h);
+}
+
+std::tuple<Coordenada,Coordenada> Dibujo::getCoordenadas(){
+    return std::make_tuple(x,y);
+}
+
+std::tuple<int,int> Dibujo::puntoMedio(){
+    return std::make_tuple(int(x + (imagen->w / 2)),int(y + (imagen->h / 2)));
+}
 
 void Dibujo::setImagen(const char * file){
     imagen = load_bitmap(file,NULL);
