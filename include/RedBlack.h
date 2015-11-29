@@ -3,11 +3,10 @@
 #include "iostream"
 #include "fstream"
 #include "list"
+#include "sad.h"
 
-using namespace std;
 
-enum Colores{NEGRO, ROJO, DOBLENEGRO};
-enum Rotaciones{IZQUIERDA, DERECHA};
+
 template <typename T, typename S>
 class RedBlack
 {
@@ -31,7 +30,7 @@ class RedBlack
         void insert(T);
         bool find(T);
         bool find(T, S&);
-        list<S> getNodes();
+        std::list<S> getNodes();
         void rotacionCompleja(Nodo *&, bool);
         S & operator[](T);
         virtual ~RedBlack();
@@ -55,9 +54,9 @@ bool RedBlack<T,S>::find(T valor){
 }
 
 template <typename T, typename S>
-list<S> RedBlack<T,S>::getNodes(){
-    list<S> result;
-    list<Nodo *> nodos;
+std::list<S> RedBlack<T,S>::getNodes(){
+    std::list<S> result;
+    std::list<Nodo *> nodos;
     if(root) nodos.push_back(root);
     for(auto iter = nodos.begin(); iter != nodos.end(); ++iter){
         result.push_back((*iter)->second);
@@ -133,13 +132,10 @@ void RedBlack<T,S>::del(T valor){
         if(!_maxIzquierda(nodoTemp)){
             f = true;
         }
-        swap((*nodo)->valor, (*nodoTemp)->valor);
+        std::swap((*nodo)->valor, (*nodoTemp)->valor);
         nodo = nodoTemp;
     }
-    cout<<"HHNODO->"<<(*nodo)->valor<<endl;
-    cout<<"HHPADRE->"<<(*nodo)->padre->valor<<endl;
     if((*nodo)->hijos[0]){
-        cout<<"HHHIJO IZQ->"<<(*nodo)->hijos[0]->valor<<endl;
         auto temp = *nodo;
         *nodo = (*nodo)->hijos[0];
         (*nodo)->padre = temp->padre;
@@ -165,8 +161,6 @@ void RedBlack<T,S>::del(T valor){
             if(f) flag = !flag;
             flagg = flag;
             while(true){
-                cout<<"NODO->"<<(*nodo)->valor<<endl;
-                cout<<"PADRE->"<<(*nodo)->padre->valor<<endl;
                 if((*nodo) == root){
                     root->color = NEGRO;
                     break;
@@ -210,11 +204,6 @@ void RedBlack<T,S>::del(T valor){
                     break;
                 }
             }
-            cout<<"GGGGGGGGGG->"<<temp->valor<<endl;
-            cout<<"GGGGGGGGGG22->"<<temp->padre->valor<<endl;
-            if(temp->padre->hijos[!flagg]){
-                cout<<"dddddddddddddddd->"<<temp->padre->hijos[!flagg]->valor<<endl;;
-            }
             temp->padre->hijos[!flagg] = nullptr;
             ///delete temp;
         }
@@ -223,27 +212,27 @@ void RedBlack<T,S>::del(T valor){
 
 template <typename T, typename S>
 void RedBlack<T,S>::print(){
-    ofstream archivo("eje.dot");
+    std::ofstream archivo("eje.dot");
     if(archivo.fail()){
-        cout<<"No se puede abrir el archivo"<<endl;
+        std::cout<<"No se puede abrir el archivo"<<std::endl;
         return;
     }
-    archivo<<"digraph{"<<endl;
-    list<Nodo *> result;
+    archivo<<"digraph{"<<std::endl;
+    std::list<Nodo *> result;
     if(root)result.push_back(root);
     while(!result.empty()){
-        list<Nodo *> temp;
+        std::list<Nodo *> temp;
         for(auto iter = result.begin(); iter != result.end(); ++iter){
-            string color;
+            std::string color;
             if((*iter)->color) color = "red";
             else color = "black";
-            archivo<<(*iter)->valor<<" [label = \""<<(*iter)->valor<<" - "<<(*iter)->second<<"\" color="<<color<<"]"<<endl;
+            archivo<<(*iter)->valor<<" [label = \""<<(*iter)->valor<<" - "<<(*iter)->second<<"\" color="<<color<<"]"<<std::endl;
             if((*iter)->hijos[0]){
-                archivo<<(*iter)->valor<<"->"<<(*iter)->hijos[0]->valor<<endl;
+                archivo<<(*iter)->valor<<"->"<<(*iter)->hijos[0]->valor<<std::endl;
                 temp.push_back((*iter)->hijos[0]);
             }
             if((*iter)->hijos[1]){
-                archivo<<(*iter)->valor<<"->"<<(*iter)->hijos[1]->valor<<endl;
+                archivo<<(*iter)->valor<<"->"<<(*iter)->hijos[1]->valor<<std::endl;
                 temp.push_back((*iter)->hijos[1]);
             }
         }

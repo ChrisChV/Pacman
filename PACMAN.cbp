@@ -37,8 +37,10 @@
 		<Unit filename="include/Dibujo.h" />
 		<Unit filename="include/Game.h" />
 		<Unit filename="include/IntervalTree.h" />
+		<Unit filename="include/RedBlack.h" />
 		<Unit filename="include/Seres.h" />
 		<Unit filename="include/Tablero.h" />
+		<Unit filename="include/Tempo.h" />
 		<Unit filename="include/sad.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="src/Dibujo.cpp" />
@@ -47,6 +49,7 @@
 		<Unit filename="src/Pacman.cpp" />
 		<Unit filename="src/Seres.cpp" />
 		<Unit filename="src/Tablero.cpp" />
+		<Unit filename="src/Tempo.cpp" />
 		<Extensions>
 			<code_completion />
 			<debugger />

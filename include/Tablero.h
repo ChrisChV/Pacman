@@ -2,9 +2,10 @@
 #define TABLERO_H
 #include "IntervalTree.h"
 #include "Seres.h"
+#include <map>
 #include <iostream>
 
-int ANCHO_VENTANA = 1000;
+int ANCHO_VENTANA = 1200;
 int ALTO_VENTANA = 700;
 
 const char * __filePacman__Derecha = "pac_der.pcx";
@@ -15,9 +16,11 @@ const int _pacman_vel  = 1;
 
 const char * __fileFantasmita__Izquierda = "fan";
 const char * __fileFantasmita__Arriba = "fan";
-const char * __fileFantasmita__Derecha = "fan";
+const char * __fileFantasmita__Derecha = "rojito.pcx";
 const char * __fileFantasmita__Abajo = "fan";
 
+const char * __fileBolita__Normal = "bolita.pcx";
+const char * __fileBolita__Especial = "bolitaRoja.pcx";
 
 enum Direcciones{HORIZONTAL, VERTICAL};
 
@@ -74,10 +77,15 @@ class Tablero
         void dibujarPacman();
         void actualizarPacman();
         void actualizarPosPacman();
+        bool verificarColisionBolita();
+        bool ganar();
         void actualizarDireccionPacman(Dir_Ser);
-        IntervalTree<Coordenada,Caminos *> intervals[2];
+        int largoPared;
+        int largoMedia;
+        int altoPared;
+        int altoMedia;
         //IntervalTree<Coordenada,Caminos *> intervalVerticales;
-        std::list<Dibujo *> paredes;
+        std::list<Dibujo *> objetosTab;
         virtual ~Tablero();
     protected:
     private:
@@ -86,58 +94,139 @@ class Tablero
         BITMAP * buffer;
         BITMAP * bufferPac;
         Pacman * pac;
-
+        IntervalTree<Coordenada,Caminos *> intervals[2];
+        std::map<int,std::map<int,bool>> bolitasNormales;
+        std::map<int,std::map<int,bool>> bolitasEspeciales;
 };
+
+bool Tablero::ganar(){
+    if(bolitasNormales.empty() and bolitasEspeciales.empty())return true;
+    return false;
+}
+
+bool Tablero::verificarColisionBolita(){
+    if(pac->direccion == DIR_DERECHA or pac->direccion == DIR_IZQUIERDA){
+        if(largoPared){
+            largoPared--;
+            return false;
+        }
+        else{
+            largoPared = largoMedia * 2 - 1;
+        }
+    }
+    else if(pac->direccion == DIR_ABAJO or pac->direccion == DIR_ARRIBA){
+        if(altoPared){
+            altoPared--;
+            return false;
+        }
+        else{
+            altoPared = altoMedia * 2;
+        }
+    }
+    auto med = pac->puntoMedio();
+    auto iter = bolitasNormales.find(std::get<0>(med));
+    bool flag = false;
+    if(iter != bolitasNormales.end()){
+        auto iter2 = iter->second.find(std::get<1>(med));
+        if(iter2 != iter->second.end()){
+            iter->second.erase(iter2);
+            if(iter->second.empty()) bolitasNormales.erase(iter);
+            return false;
+        }
+    }
+    auto iter2 = bolitasEspeciales.find(std::get<0>(med));
+    if(iter2 != bolitasEspeciales.end()){
+        auto iter3 = iter2->second.find(std::get<1>(med));
+        if(iter3 != iter2->second.end()){
+            iter2->second.erase(iter3);
+            if(iter2->second.empty()) bolitasEspeciales.erase(iter2);
+            return true;
+        }
+    }
+    return false;
+}
 
 void Tablero::actualizarPacman(){
     if(pac->estoyEnInter()){
-        auto med = pac->puntoMedio();
-        auto cor = pac->getCoordenadas();
-        Coordenada corX = std::get<0>(med) - std::get<0>(cor);
-        Coordenada corY = std::get<0>(med) - std::get<0>(cor);
-        pac->updateX(pac->interDestinoPacActual->x - corX);
-        pac->updateY(pac->interDestinoPacActual->y - corY);
+        //auto med = pac->puntoMedio();
+        //auto cor = pac->getCoordenadas();
+        //Coordenada corX = std::get<0>(med) - std::get<0>(cor);
+        //Coordenada corY = std::get<1>(med) - std::get<1>(cor);
+        //pac->updateX(pac->interDestinoPacActual->x - corX);
+        //pac->updateY(pac->interDestinoPacActual->y - corY);
+        largoPared = 0;
+        altoPared = 0;
+        int a;
+        int b;
         switch(pac->proximaDir){
             case DIR_IZQUIERDA:
+                verificarColisionBolita();
                 pac->cambiarDir(DIR_IZQUIERDA);
+                verificarColisionBolita();
                 pac->avanzar();
+          //      verificarColisionBolita();
                 actualizarPosPacman();
                 break;
             case DIR_DERECHA:
+                verificarColisionBolita();
                 pac->cambiarDir(DIR_DERECHA);
+                verificarColisionBolita();
                 pac->avanzar();
+            //    verificarColisionBolita();
                 actualizarPosPacman();
                 break;
             case DIR_ARRIBA:
+                verificarColisionBolita();
                 pac->cambiarDir(DIR_ARRIBA);
+                verificarColisionBolita();
                 pac->avanzar();
+              //  verificarColisionBolita();
                 actualizarPosPacman();
+                a = pac->caminoPacActual->a;
+                b = pac->caminoPacActual->b;
                 break;
             case DIR_ABAJO:
+                verificarColisionBolita();
                 pac->cambiarDir(DIR_ABAJO);
+                verificarColisionBolita();
                 pac->avanzar();
+            //    verificarColisionBolita();
                 actualizarPosPacman();
                 break;
             case NO_HAY_DIR:
                 if(pac->interDestinoPacActual->vecinos[pac->direccion]){
+                    verificarColisionBolita();
                     pac->avanzar();
+                   // verificarColisionBolita();
                     actualizarPosPacman();
                 }
+                else{
+                    verificarColisionBolita();
+                    largoPared = 0;
+                    altoPared = 0;
+                }
         }
+        pac->proximaDir = NO_HAY_DIR;
     }
     else{
+        verificarColisionBolita();
         pac->avanzar();
     }
     dibujarPacman();
 }
 
 void Tablero::actualizarDireccionPacman(Dir_Ser dir){
+    if(pac->direccion == dir){
+        pac->proximaDir = NO_HAY_DIR;
+        return;
+    }
     switch(pac->direccion){
         case DIR_DERECHA:
             if(dir == DIR_IZQUIERDA){
                 pac->interDestinoPacActual = pac->caminoPacActual->inters[0];
                 pac->cambiarDir(DIR_IZQUIERDA);
                 pac->proximaDir = NO_HAY_DIR;
+                largoPared = (largoMedia * 2) - largoPared;
                 return;
             }
             break;
@@ -146,6 +235,7 @@ void Tablero::actualizarDireccionPacman(Dir_Ser dir){
                 pac->interDestinoPacActual = pac->caminoPacActual->inters[1];
                 pac->cambiarDir(DIR_DERECHA);
                 pac->proximaDir = NO_HAY_DIR;
+                largoPared = (largoMedia * 2) - largoPared;
                 return;
             }
             break;
@@ -154,6 +244,7 @@ void Tablero::actualizarDireccionPacman(Dir_Ser dir){
                 pac->interDestinoPacActual = pac->caminoPacActual->inters[1];
                 pac->cambiarDir(DIR_ABAJO);
                 pac->proximaDir = NO_HAY_DIR;
+                altoPared = (altoMedia * 2) - altoPared + 1;
                 return;
             }
             break;
@@ -162,6 +253,7 @@ void Tablero::actualizarDireccionPacman(Dir_Ser dir){
                 pac->interDestinoPacActual = pac->caminoPacActual->inters[0];
                 pac->cambiarDir(DIR_ARRIBA);
                 pac->proximaDir = NO_HAY_DIR;
+                altoPared = (altoMedia * 2) - altoPared + 1;
                 return;
             }
             break;
@@ -213,17 +305,13 @@ void Tablero::actualizarPosPacman(){
     auto med = pac->puntoMedio();
     int temp;
     if(pac->direccion == DIR_DERECHA or pac->direccion == DIR_IZQUIERDA){
-        std::cout<<"hola"<<std::endl;
-        intervals[0]._print();
+        //intervals[0]._print();
         pac->caminoPacActual = findCamino(std::get<1>(med),intervals[0].find(std::get<0>(med),std::get<0>(med)));
     }
     else{
-    std::cout<<"adios"<<std::endl;
         pac->caminoPacActual = findCamino(std::get<0>(med),intervals[1].find(std::get<1>(med),std::get<1>(med)));
     }
-    std::cout<<"A->"<<pac->caminoPacActual->a<<std::endl;
-    std::cout<<"B->"<<pac->caminoPacActual->b<<std::endl;
-    if(pac->direccion == DIR_DERECHA or pac->direccion == DIR_ARRIBA){
+    if(pac->direccion == DIR_DERECHA or pac->direccion == DIR_ABAJO){
         pac->interDestinoPacActual = pac->caminoPacActual->inters[1];
     }
     else{
@@ -235,8 +323,6 @@ void Tablero::dibujarPacman(){
     pac->dibujar();
     auto tam = pac->getTamImagen();
     auto coor = pac->getCoordenadas();
-    std::cout<<"X->"<<std::get<0>(coor)<<std::endl;
-    std::cout<<"Y->"<<std::get<1>(coor)<<std::endl;
     blit(bufferPac,screen,0,0,std::get<0>(coor),std::get<1>(coor),std::get<0>(coor),std::get<1>(coor));
 }
 
@@ -255,7 +341,7 @@ Tablero::Caminos * Tablero::findCamino(Coordenada coor, std::list<IntervalTree<C
 }
 
 void Tablero::dibujarTablero(){
-    for(Dibujo * d : paredes){
+    for(Dibujo * d : objetosTab){
         d->dibujar();
     }
     blit(buffer,screen,0,0,0,0,ANCHO_VENTANA,ALTO_VENTANA);
@@ -283,10 +369,10 @@ Tablero::Tablero(std::string * m, int fil, int col, const char * paredFile, BITM
     this->col = col;
     this->buffer = buffer;
     BITMAP * pared = load_bitmap(paredFile,NULL);
-    int largoPared = pared->w;
-    int largoMedia = largoPared / 2;
-    int altoPared = pared->h;
-    int altoMedia = altoPared / 2;
+    largoPared = pared->w;
+    largoMedia = largoPared / 2;
+    altoPared = pared->h;
+    altoMedia = altoPared / 2;
     Coordenada coordenadaY = altoMedia;
     for(int i = 0; i < fil; i++){
         bool flag = false;
@@ -295,8 +381,19 @@ Tablero::Tablero(std::string * m, int fil, int col, const char * paredFile, BITM
         Dis_Intersects camino = 0;
         Coordenada coordenadaX = largoMedia;
         for(int j = 0; j < col; j++){
-            if((m[i][j] == ' ' or m[i][j] == 'c') and !flag){
-                if(m[i][j] == 'c'){
+            if((m[i][j] == ' ' or m[i][j] == 'c' or m[i][j] == 'b' or m[i][j] == 'B' or m[i][j] == 'f') and !flag){
+                if(m[i][j] == 'f'){
+                    objetosTab.push_back(new Dibujo(__fileFantasmita__Derecha,buffer,coordenadaX - largoMedia,coordenadaY - altoMedia));
+                }
+                else if(m[i][j] == 'b'){
+                    bolitasNormales[coordenadaX][coordenadaY] = true;
+                    objetosTab.push_back(new Dibujo(__fileBolita__Normal,buffer,coordenadaX - largoMedia,coordenadaY - altoMedia));
+                }
+                else if(m[i][j] == 'B'){
+                    bolitasEspeciales[coordenadaX][coordenadaY] = true;
+                    objetosTab.push_back(new Dibujo(__fileBolita__Especial,buffer,coordenadaX - largoMedia,coordenadaY - altoMedia));
+                }
+                else if(m[i][j] == 'c'){
                     pac = new Pacman(coordenadaX - largoMedia, coordenadaY - altoMedia);
                     bufferPac = pac->getBuffer();
                 }
@@ -305,7 +402,18 @@ Tablero::Tablero(std::string * m, int fil, int col, const char * paredFile, BITM
                 flag = true;
                 camino ++;
             }
-            else if((m[i][j] == ' ' or m[i][j] == 'c') and flag and (m[i-1][j] == ' ' or m[i+1][j] == ' ')){
+            else if((m[i][j] == ' ' or m[i][j] == 'c' or m[i][j] == 'b' or m[i][j] == 'B' or m[i][j] == 'f') and flag and (m[i-1][j] == ' ' or m[i+1][j] == ' ' or m[i-1][j] == 'b' or m[i-1][j] == 'B' or m[i+1][j] == 'b' or m[i+1][j] == 'B')){
+                if(m[i][j] == 'f'){
+                    objetosTab.push_back(new Dibujo(__fileFantasmita__Derecha,buffer,coordenadaX - largoMedia,coordenadaY - altoMedia));
+                }
+                else if(m[i][j] == 'b'){
+                    bolitasNormales[coordenadaX][coordenadaY] = true;
+                    objetosTab.push_back(new Dibujo(__fileBolita__Normal,buffer,coordenadaX - largoMedia,coordenadaY - altoMedia));
+                }
+                else if(m[i][j] == 'B'){
+                    bolitasEspeciales[coordenadaX][coordenadaY] = true;
+                    objetosTab.push_back(new Dibujo(__fileBolita__Especial,buffer,coordenadaX - largoMedia,coordenadaY - altoMedia));
+                }
                 if(m[i][j] == 'c'){
                     pac = new Pacman(coordenadaX - largoMedia, coordenadaY - altoMedia);
                     bufferPac = pac->getBuffer();
@@ -329,7 +437,18 @@ Tablero::Tablero(std::string * m, int fil, int col, const char * paredFile, BITM
                 coordenadaX += largoPared;
                 camino = 1;
             }
-            else if((m[i][j] == ' ' or m[i][j] == 'c') and flag){
+            else if((m[i][j] == ' ' or m[i][j] == 'c' or m[i][j] == 'b' or m[i][j] == 'B' or m[i][j] == 'f') and flag){
+                if(m[i][j] == 'f'){
+                    objetosTab.push_back(new Dibujo(__fileFantasmita__Derecha,buffer,coordenadaX - largoMedia,coordenadaY - altoMedia));
+                }
+                else if(m[i][j] == 'b'){
+                    bolitasNormales[coordenadaX][coordenadaY] = true;
+                    objetosTab.push_back(new Dibujo(__fileBolita__Normal,buffer,coordenadaX - largoMedia,coordenadaY - altoMedia));
+                }
+                else if(m[i][j] == 'B'){
+                    bolitasEspeciales[coordenadaX][coordenadaY] = true;
+                    objetosTab.push_back(new Dibujo(__fileBolita__Especial,buffer,coordenadaX - largoMedia,coordenadaY - altoMedia));
+                }
                 if(m[i][j] == 'c'){
                     pac = new Pacman(coordenadaX - largoMedia, coordenadaY - altoMedia);
                     bufferPac = pac->getBuffer();
@@ -348,13 +467,13 @@ Tablero::Tablero(std::string * m, int fil, int col, const char * paredFile, BITM
                 else{
                     inter1 = nullptr;
                 }
-                paredes.push_back(new Dibujo(paredFile,buffer,coordenadaX - largoMedia,coordenadaY - altoMedia));
+                objetosTab.push_back(new Dibujo(paredFile,buffer,coordenadaX - largoMedia,coordenadaY - altoMedia));
                 coordenadaX += largoPared;
                 camino = 0;
                 flag = false;
             }
             else if(m[i][j] == 'x' and !flag){
-                paredes.push_back(new Dibujo(paredFile,buffer,coordenadaX - largoMedia,coordenadaY - altoMedia));
+                objetosTab.push_back(new Dibujo(paredFile,buffer,coordenadaX - largoMedia,coordenadaY - altoMedia));
                 coordenadaX += largoPared;
             }
         }
@@ -375,16 +494,16 @@ Tablero::Tablero(std::string * m, int fil, int col, const char * paredFile, BITM
         Dis_Intersects camino = 0;
         coordenadaY = altoMedia;
         for(int j = 0; j < fil; j++){
-            if((m[j][i] == ' ' or m[j][i] == 'c') and !flag){
+            if((m[j][i] == ' ' or m[j][i] == 'c'  or m[j][i] == 'b' or m[j][i] == 'B' or m[j][i] == 'f') and !flag){
                 std::list<IntervalTree<Coordenada,Caminos *>::Nodo *> res = intervals[HORIZONTAL].find(coordenadaX,coordenadaX);
                 if(res.empty()){
                     inter1 = new Intersecciones(coordenadaX,coordenadaY);
                 }
                 else{
                     int sisss = res.size();
-                    Caminos * temp = findCamino(coordenadaY,res);
-                    float tt = temp->a;
-                    float tt2 = temp->b;
+                    //Caminos * temp = findCamino(coordenadaY,res);
+                    //float tt = temp->a;
+                    //float tt2 = temp->b;
                     inter1 = findCamino(coordenadaY,res)->findInter(coordenadaX,coordenadaY);
 
                 }
@@ -392,7 +511,7 @@ Tablero::Tablero(std::string * m, int fil, int col, const char * paredFile, BITM
                 flag = true;
                 camino ++;
             }
-            else if((m[j][i] == ' ' or m[j][i] == 'c') and flag and (m[j][i-1] == ' ' or m[j][i+1] == ' ')){
+            else if((m[j][i] == ' ' or m[j][i] == 'c' or  m[j][i] == 'b' or m[j][i] == 'B' or m[j][i] == 'f') and flag and (m[j][i-1] == ' ' or m[j][i+1] == ' ' or m[j][i-1] == 'b' or m[j][i-1] == 'B' or m[j][i+1] == 'b' or m[j][i+1] == 'B')){
                 ///intervalHorizontales._print();
                 std::list<IntervalTree<Coordenada,Caminos *>::Nodo *> res = intervals[HORIZONTAL].find(coordenadaX,coordenadaX);
                 if(res.empty()){
@@ -426,7 +545,7 @@ Tablero::Tablero(std::string * m, int fil, int col, const char * paredFile, BITM
                 coordenadaY += altoPared;
                 camino = 1;
             }
-            else if((m[j][i] == ' ' or m[j][i] == 'c') and flag){
+            else if((m[j][i] == ' ' or m[j][i] == 'c'  or m[j][i] == 'b' or m[j][i] == 'B' or m[j][i] == 'f') and flag){
                 camino++;
                 coordenadaY += altoPared;
             }
@@ -558,10 +677,10 @@ Tablero::Pacman::Pacman(Coordenada x, Coordenada y){
     serDerecha = load_bitmap(__filePacman__Derecha,NULL);
     serArriba = load_bitmap(__filePacman__Arriba,NULL);
     serAbajo = load_bitmap(__filePacman__Abajo,NULL);
-    imagen = serIzquierda;
+    imagen = serDerecha;
     buffer = create_bitmap(imagen->w,imagen->h);
     clear_to_color(buffer, 0x999999);
-    direccion = DIR_IZQUIERDA;
+    direccion = DIR_DERECHA;
     proximaDir = NO_HAY_DIR;
     this->x = x;
     this->y = y;

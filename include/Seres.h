@@ -56,6 +56,8 @@ void Seres::cambiarDir(Dir_Ser dir){
 }
 
 void Seres::avanzar(){
+    clear_to_color(buffer, 0x999999);
+    blit(buffer,screen,0,0,x,y,x,y);
     switch(direccion){
         case DIR_IZQUIERDA:
             x -= velocidad;
